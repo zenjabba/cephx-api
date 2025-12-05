@@ -1,0 +1,25 @@
+# FastAPI and web framework dependencies
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+
+# Pydantic for data validation
+pydantic==2.5.3
+pydantic-settings==2.1.0
+
+# Python 3.11+ compatibility
+python-dotenv==1.0.0
+
+# CLI dependencies
+bcrypt>=4.0.0
+tabulate>=0.9.0
+colorama>=0.4.6
+pyyaml>=6.0
+
+# Development dependencies (optional)
+pytest==7.4.4
+pytest-cov==4.1.0
+httpx==0.26.0
+mypy==1.8.0
+black==24.1.1
+ruff==0.1.14

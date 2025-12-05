@@ -1,0 +1,120 @@
+# Logging configuration for Uvicorn and application
+version: 1
+disable_existing_loggers: false
+
+formatters:
+  default:
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    datefmt: "%Y-%m-%d %H:%M:%S"
+
+  json:
+    (): pythonjsonlogger.jsonlogger.JsonFormatter
+    format: "%(asctime)s %(name)s %(levelname)s %(message)s"
+    datefmt: "%Y-%m-%d %H:%M:%S"
+
+  access:
+    format: "%(asctime)s - %(client_addr)s - \"%(request_line)s\" %(status_code)s"
+    datefmt: "%Y-%m-%d %H:%M:%S"
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: INFO
+    formatter: default
+    stream: ext://sys.stdout
+
+  console_json:
+    class: logging.StreamHandler
+    level: INFO
+    formatter: json
+    stream: ext://sys.stdout
+
+  file:
+    class: logging.handlers.RotatingFileHandler
+    level: INFO
+    formatter: json
+    filename: ./logs/cephx-api.log
+    maxBytes: 10485760  # 10MB
+    backupCount: 5
+    encoding: utf8
+
+  error_file:
+    class: logging.handlers.RotatingFileHandler
+    level: ERROR
+    formatter: json
+    filename: ./logs/cephx-api-error.log
+    maxBytes: 10485760  # 10MB
+    backupCount: 5
+    encoding: utf8
+
+  access_file:
+    class: logging.handlers.RotatingFileHandler
+    level: INFO
+    formatter: access
+    filename: ./logs/cephx-api-access.log
+    maxBytes: 10485760  # 10MB
+    backupCount: 5
+    encoding: utf8
+
+loggers:
+  # Application loggers
+  app:
+    level: INFO
+    handlers:
+      - console
+      - file
+      - error_file
+    propagate: false
+
+  app.ceph:
+    level: INFO
+    handlers:
+      - console
+      - file
+    propagate: false
+
+  app.routers:
+    level: INFO
+    handlers:
+      - console
+      - file
+    propagate: false
+
+  # Uvicorn loggers
+  uvicorn:
+    level: INFO
+    handlers:
+      - console
+    propagate: false
+
+  uvicorn.error:
+    level: INFO
+    handlers:
+      - console
+      - error_file
+    propagate: false
+
+  uvicorn.access:
+    level: INFO
+    handlers:
+      - access_file
+    propagate: false
+
+  # FastAPI
+  fastapi:
+    level: INFO
+    handlers:
+      - console
+      - file
+    propagate: false
+
+root:
+  level: INFO
+  handlers:
+    - console
+    - file
+
+# Note: To use JSON logging, install python-json-logger:
+# pip install python-json-logger
+#
+# Then change console handler to console_json and restart the application

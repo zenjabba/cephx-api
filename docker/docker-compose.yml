@@ -1,0 +1,121 @@
+version: '3.8'
+
+services:
+  ceph-api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+
+    image: ceph-api:latest
+
+    container_name: ceph-api
+
+    # Use host network for direct Ceph access
+    # Alternative: Use bridge network with port mapping
+    network_mode: host
+
+    # Alternative network configuration:
+    # networks:
+    #   - ceph-network
+    # ports:
+    #   - "10.10.2.20:8080:8080"
+
+    environment:
+      # Application configuration
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=info
+
+      # Database configuration
+      - DATABASE_PATH=/opt/ceph-api/data
+
+      # Ceph configuration
+      - CEPH_CONF=/etc/ceph/ceph.conf
+      - CEPH_KEYRING=/etc/ceph/ceph.client.admin.keyring
+
+      # API configuration
+      - API_HOST=10.10.2.20
+      - API_PORT=8080
+      - API_WORKERS=4
+
+      # Optional: Override via environment file
+      # - CONFIG_FILE=/opt/ceph-api/config/config.yaml
+
+    # Alternative: Use environment file
+    # env_file:
+    #   - .env
+
+    volumes:
+      # Mount Ceph configuration (read-only)
+      - /etc/ceph:/etc/ceph:ro
+
+      # Persistent data storage
+      - ceph-api-data:/opt/ceph-api/data
+
+      # Application configuration
+      - ./config:/opt/ceph-api/config:ro
+
+      # Log directory (optional)
+      - ceph-api-logs:/var/log/ceph-api
+
+    restart: unless-stopped
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    # Security options
+    security_opt:
+      - no-new-privileges:true
+
+    # Read-only root filesystem (optional, requires writable volumes)
+    # read_only: true
+
+    # tmpfs for temporary files
+    tmpfs:
+      - /tmp
+      - /run
+
+# Alternative network configuration
+# networks:
+#   ceph-network:
+#     driver: bridge
+#     ipam:
+#       config:
+#         - subnet: 172.20.0.0/16
+
+# Persistent volumes
+volumes:
+  ceph-api-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /opt/ceph-api/data
+
+  ceph-api-logs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /var/log/ceph-api

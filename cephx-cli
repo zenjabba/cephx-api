@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Wrapper script for Ceph Management API CLI
+
+# Get the directory where this script is located
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# Run the CLI module
+python3 -m app.cli "$@"

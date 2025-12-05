@@ -1,0 +1,77 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+docs/
+LICENSE
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Testing
+.pytest_cache/
+.coverage
+.tox/
+htmlcov/
+.mypy_cache/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Deployment files
+systemd/
+scripts/
+firewall/
+docker/docker-compose.yml
+
+# Data and logs (will be mounted as volumes)
+data/
+logs/
+*.db
+*.log
+
+# Backups
+*.bak
+*.backup
+backups/
+
+# Local configuration
+.env
+.env.local
+config/config.yaml
+!config/config.yaml.example
+
+# Temporary files
+tmp/
+temp/
+*.tmp

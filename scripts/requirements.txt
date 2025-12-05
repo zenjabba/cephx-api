@@ -1,0 +1,51 @@
+# Ceph Management REST API - Python Dependencies
+# This file is used by the installation scripts
+
+# Core Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# Ceph Client Libraries
+# Note: python3-rados, python3-cephfs, python3-rbd are installed via apt
+# These provide the rados, cephfs, and rbd modules
+
+# Data Validation
+pydantic==2.5.0
+pydantic-settings==2.1.0
+
+# Configuration
+pyyaml==6.0.1
+python-dotenv==1.0.0
+
+# Database
+sqlalchemy==2.0.23
+aiosqlite==0.19.0
+
+# Security & Authentication
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+bcrypt==4.1.1
+cryptography==41.0.7
+
+# HTTP Client
+httpx==0.25.2
+
+# Utilities
+python-multipart==0.0.6
+email-validator==2.1.0
+
+# Monitoring & Logging
+prometheus-client==0.19.0
+python-json-logger==2.0.7
+
+# Testing (optional, for development)
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+httpx==0.25.2
+
+# Development tools (optional)
+black==23.12.0
+isort==5.13.2
+flake8==6.1.0
+mypy==1.7.1
