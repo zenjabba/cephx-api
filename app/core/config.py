@@ -27,8 +27,8 @@ class Settings(BaseSettings):
     api_key_header: str = "X-API-Key"
     api_keys: Dict[str, Dict[str, Union[str, List[str]]]] = Field(
         default_factory=lambda: {
-            "admin-key": {"name": "admin", "permissions": ["fs:read", "fs:write", "pool:read", "pool:write", "cluster:read", "auth:read", "auth:write"]},
-            "readonly-key": {"name": "readonly", "permissions": ["fs:read", "pool:read", "cluster:read", "auth:read"]},
+            "admin-key": {"name": "admin", "permissions": ["fs:read", "fs:write", "pool:read", "pool:write", "cluster:read", "osd:read", "osd:write", "auth:read", "auth:write"]},
+            "readonly-key": {"name": "readonly", "permissions": ["fs:read", "pool:read", "cluster:read", "osd:read", "auth:read"]},
         }
     )
 

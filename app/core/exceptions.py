@@ -136,6 +136,19 @@ class InvalidAPIKeyError(CephAPIException):
         )
 
 
+class OSDNotFoundError(CephAPIException):
+    """Raised when an OSD cannot be found."""
+
+    def __init__(self, osd_id: int, details: Union[Union[Dict[str, Any], None]] = None) -> None:
+        """Initialize with OSD ID."""
+        super().__init__(
+            message=f"OSD '{osd_id}' not found",
+            code="OSD_NOT_FOUND",
+            status_code=404,
+            details=details or {"osd_id": osd_id},
+        )
+
+
 class SnapshotScheduleNotFoundError(CephAPIException):
     """Raised when a snapshot schedule is not found."""
 

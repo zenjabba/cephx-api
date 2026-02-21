@@ -11,7 +11,7 @@ from app.core.config import get_settings
 from app.core.exceptions import CephAPIException
 from app.core.logging import setup_logging
 from app.models.filesystem import APIResponse
-from app.routers import auth, cluster, filesystem, snapshot
+from app.routers import auth, cluster, filesystem, osd, snapshot
 
 # Setup logging
 setup_logging()
@@ -64,11 +64,20 @@ async def validation_exception_handler(
     """Handle request validation errors."""
     logger.warning(f"Validation error: {exc.errors()}")
 
+    # Sanitize errors — pydantic ctx.error contains raw Exception objects
+    # that aren't JSON serializable
+    sanitized = []
+    for err in exc.errors():
+        clean = {k: v for k, v in err.items() if k != "ctx"}
+        if "ctx" in err:
+            clean["ctx"] = {k: str(v) for k, v in err["ctx"].items()}
+        sanitized.append(clean)
+
     response = APIResponse(
         status="error",
         code="VALIDATION_ERROR",
         message="Request validation failed",
-        details={"errors": exc.errors()},
+        details={"errors": sanitized},
     )
 
     return JSONResponse(
@@ -122,6 +131,12 @@ app.include_router(
     filesystem.router,
     prefix=f"{settings.api_v1_prefix}/fs",
     tags=["Filesystems"],
+)
+
+app.include_router(
+    osd.router,
+    prefix=f"{settings.api_v1_prefix}/ceph/osd",
+    tags=["OSD"],
 )
 
 app.include_router(

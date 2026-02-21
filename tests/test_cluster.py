@@ -6,21 +6,29 @@ from unittest.mock import MagicMock, patch
 import pytest
 from fastapi.testclient import TestClient
 
+from app.routers.cluster import _cache
 from main import app
 
 client = TestClient(app)
 
-# Mock Ceph status response
+# Mock response for `ceph mon dump --format json` (top-level mons list)
+MOCK_MON_DUMP = {
+    "epoch": 5,
+    "fsid": "12345678-1234-1234-1234-123456789abc",
+    "mons": [
+        {"name": "ceph01", "addr": "10.10.1.1:6789/0", "rank": 0},
+        {"name": "ceph02", "addr": "10.10.1.2:6789/0", "rank": 1},
+        {"name": "ceph03", "addr": "10.10.1.3:6789/0", "rank": 2},
+    ],
+}
+
+# Mock response for `ceph status --format json` (monmap has num_mons, not mons list)
 MOCK_CEPH_STATUS = {
     "fsid": "12345678-1234-1234-1234-123456789abc",
     "health": {"status": "HEALTH_OK"},
     "monmap": {
         "epoch": 5,
-        "mons": [
-            {"name": "ceph01", "addr": "10.10.1.1:6789/0", "rank": 0},
-            {"name": "ceph02", "addr": "10.10.1.2:6789/0", "rank": 1},
-            {"name": "ceph03", "addr": "10.10.1.3:6789/0", "rank": 2},
-        ],
+        "num_mons": 3,
     },
     "osdmap": {
         "osdmap": {
@@ -70,13 +78,19 @@ MOCK_CEPH_DF = {
 }
 
 
+@pytest.fixture(autouse=True)
+def _clear_route_cache() -> None:
+    """Clear the TTL cache before each test to prevent cross-test pollution."""
+    _cache.clear()
+
+
 class TestMonitorsEndpoint:
     """Tests for /monitors endpoint."""
 
     @patch("app.services.ceph_client.ceph_client.execute_command")
     def test_get_monitors_success(self, mock_execute: MagicMock) -> None:
         """Test successful retrieval of monitors."""
-        mock_execute.return_value = MOCK_CEPH_STATUS
+        mock_execute.return_value = MOCK_MON_DUMP
 
         response = client.get(
             "/api/v1/cluster/monitors",
